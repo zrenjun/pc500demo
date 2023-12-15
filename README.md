@@ -19,7 +19,7 @@
 > Step 2. Add the dependency     
 > 
 >      dependencies {
-> 	    implementation 'com.github.zrenjun:pcecg500:v1.0.0'
+> 	    implementation 'com.github.zrenjun:pcecg500:1.0.1'
 > 	 }
 > 
 > Step 3. Add the ndk
@@ -79,13 +79,13 @@
 > 1. 连接      
 >
 >    ```
->    usbConnManager.connectFunction()
+>    UsbManager.connect()
 >    ```
 >
 > 2. 获取数据 
 >
 >    ```
->    usbConnManager.collectReadData()
+>    usbData.collectReadData()
 >    ```
 
 
@@ -112,6 +112,7 @@
 
 > ```
 > 具体参见：viewViewModel.getValue().getLocalPdf(ecgDataArray)
+> 结论：viewViewModel.getValue().getMLocalResult().observe()
 > ```
 > 
 

@@ -23,8 +23,19 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("vthkey.jks")
+            storePassword = "aaaa2222"
+            keyAlias = "key0"
+            keyPassword = "aaaa2222"
+        }
+    }
+
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -53,5 +64,5 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
-    implementation ("com.github.zrenjun:pcecg500:v1.0.0")
+    implementation ("com.github.zrenjun:pcecg500:1.0.1")
 }

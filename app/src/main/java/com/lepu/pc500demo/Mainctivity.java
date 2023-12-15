@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -120,12 +119,16 @@ public class Mainctivity extends AppCompatActivity implements View.OnClickListen
             if (s.contains("ecg500")) {
                 FileUtil.INSTANCE.shareFile(this, new File(s), viewViewModel.getValue().isPdf() ? "application/pdf" : "application/xml");
             }
-            Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+            status(s);
         });
+        viewViewModel.getValue().getMLocalResult().observe(this, s -> {
+            status(s.toString());
+        });
+
 
         viewViewModel.getValue().getMException().observe(this, s -> {
             dismissProgressDialog();
-            Toast.makeText(this, s.getMessage(), Toast.LENGTH_SHORT).show();
+            status(s.getMessage());
         });
 
         usbData = new UsbData();
@@ -144,7 +147,7 @@ public class Mainctivity extends AppCompatActivity implements View.OnClickListen
         if (isStart) {
             isStart = false;
             clickTvStart();
-            Toast.makeText(this, R.string.detect_interrupt_re_detect, Toast.LENGTH_LONG).show();
+            status(getString(R.string.detect_interrupt_re_detect));
         }
         if (updateTimer != null) {
             updateTimer.cancel();
@@ -278,7 +281,7 @@ public class Mainctivity extends AppCompatActivity implements View.OnClickListen
         patient.setSmachineCode("gorlroq");
         patient.setDiagnosisMemo("胸痛");
         showProgressDialog();
-        viewViewModel.getValue().getAIPdf(ecgDataArray, bean, patient);
+        viewViewModel.getValue().getAIPdf(ecgDataArray, bean, patient,null,null); //默认内置存储
     }
 
     //本地分析
@@ -295,7 +298,7 @@ public class Mainctivity extends AppCompatActivity implements View.OnClickListen
         patientInfoBean.setAge("20");
         patientInfoBean.setBirthdate("2003-09-08");
         patientInfoBean.setLeadoffstate(leadOffState);
-        viewViewModel.getValue().getLocalPdf(ecgDataArray, patientInfoBean);
+        viewViewModel.getValue().getLocalPdf(ecgDataArray, patientInfoBean,null,null);
     }
 
     @Override
@@ -308,7 +311,7 @@ public class Mainctivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         if (view.getId() == R.id.tv_start) {
             if (!connected) {
-                Toast.makeText(this, R.string.detect_not_connection_usb, Toast.LENGTH_LONG).show();
+                status(getString(R.string.detect_not_connection_usb));
             } else {
                 allDetectInfo.clear();
                 isStart = !isStart;
@@ -390,8 +393,7 @@ public class Mainctivity extends AppCompatActivity implements View.OnClickListen
         UsbDeviceConnection usbConnection = usbManager.openDevice(driver.getDevice());
         if (usbConnection == null && usbPermission == UsbPermission.Unknown && !usbManager.hasPermission(driver.getDevice())) {
             usbPermission = UsbPermission.Requested;
-            int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0;
-            PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(INTENT_ACTION_GRANT_USB), flags);
+            PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(INTENT_ACTION_GRANT_USB),  PendingIntent.FLAG_IMMUTABLE);
             usbManager.requestPermission(driver.getDevice(), usbPermissionIntent);
             return;
         }
